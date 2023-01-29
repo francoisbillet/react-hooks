@@ -3,11 +3,15 @@ import * as React from 'react'
 const initialSquares = Array(9).fill(null);
 
 function Board() {
-  const [squares, setSquares] = React.useState(initialSquares);
+  const [squares, setSquares] = React.useState(() => JSON.parse(window.localStorage.getItem('squares')) || initialSquares);
 
   const nextValue = calculateNextValue(squares);
   const winner = calculateWinner(squares);
   const status = calculateStatus(winner, squares, nextValue);
+
+  React.useEffect(() => {
+    window.localStorage.setItem('squares', JSON.stringify(squares));
+  }, [squares])
 
   function selectSquare(square) {
     if (winner || squares[square] !== null) {
