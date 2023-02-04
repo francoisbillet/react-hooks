@@ -5,6 +5,7 @@ import {
   PokemonDataView,
   PokemonInfoFallback,
 } from '../pokemon'
+import ErrorBoundary from './ErrorBoundary'
 
 function PokemonInfo({pokemonName}) {
   const [{status, pokemon, error}, setState] = React.useState({
@@ -35,15 +36,19 @@ function PokemonInfo({pokemonName}) {
   } else if (status === 'resolved') {
     return <PokemonDataView pokemon={pokemon} />
   } else if (status === 'rejected') {
-    return (
-      <div role="alert">
-        There was an error:{' '}
-        <pre style={{whiteSpace: 'normal'}}>{error.message}</pre>
-      </div>
-    )
+    throw error
   } else {
     throw new Error('This is impossible !')
   }
+}
+
+const ErrorFallBack = ({error}) => {
+  return (
+    <div role="alert">
+      There was an error:{' '}
+      <pre style={{whiteSpace: 'normal'}}>{error.message}</pre>
+    </div>
+  )
 }
 
 function App() {
@@ -58,7 +63,9 @@ function App() {
       <PokemonForm pokemonName={pokemonName} onSubmit={handleSubmit} />
       <hr />
       <div className="pokemon-info">
-        <PokemonInfo pokemonName={pokemonName} />
+        <ErrorBoundary FallbackComponent={ErrorFallBack}>
+          <PokemonInfo pokemonName={pokemonName} />
+        </ErrorBoundary>
       </div>
     </div>
   )
